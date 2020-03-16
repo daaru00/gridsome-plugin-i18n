@@ -17,13 +17,13 @@ module.exports = {
     {
       use: "gridsome-plugin-i18n",
       options: {
-        locales: [ // Locales list
+        locales: [ // locales list
           'it-it',
           'fr-fr',
           'de-de',
           'en-gb'
         ],
-        pathAliases: { // Path segment alias for each locales
+        pathAliases: { // path segment alias for each locales
           'it-it': 'it',
           'fr-fr': 'fr',
           'de-de': 'de',
@@ -32,7 +32,7 @@ module.exports = {
         fallbackLocale: 'en-gb', // fallback language
         defaultLocale: 'en-gb', // default language
         messages: {
-          'it-it': require('./src/locales/it-it.json'),  // Messages files
+          'it-it': require('./src/locales/it-it.json'), // Messages files
           'fr-fr': require('./src/locales/fr-fr.json'),
           'de-de': require('./src/locales/de-de.json'),
           'en-gb': require('./src/locales/en-gb.json'),
@@ -188,5 +188,24 @@ and translate string using `$t` helper:
     {{ $t('my-message') }}
   </span>
 </template>
+```
+
+### Using with page query
+
+You can use context property `locale` to filter page queries:
+```
+<page-query>
+query($locale:String) {
+  example {
+    _allDocuments(lang:$locale) {
+      edges {
+        node {
+          title
+        }
+      }
+    }
+  }
+}
+</page-query>
 ```
 
