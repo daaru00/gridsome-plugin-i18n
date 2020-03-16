@@ -2,7 +2,15 @@
   "name": "gridsome-plugin-i18n",
   "version": "1.0.0",
   "description": "Gridsome plugin for i18n",
-  "main": "index.js",
+  "main": "gridsome.server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/daaru00/gridsome-plugin-i18n.git"
+  },
+  "bugs": {
+    "url": "https://github.com/daaru00/gridsome-plugin-i18n/issues"
+  },
+  "homepage": "https://github.com/daaru00/gridsome-plugin-i18n#readme",
   "keywords": [
     "gridsome", "i18n"
   ],
