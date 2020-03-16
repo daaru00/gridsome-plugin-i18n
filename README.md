@@ -209,3 +209,38 @@ query($locale:String) {
 </page-query>
 ```
 
+## SSR
+
+Vue i18n does not works on server side rendering due an error on plugin's auto-registration:
+> ReferenceError: window is not defined
+
+Client plugin will not load on client side so do not use `$i18n` variable for evaluation in the component like:
+```js
+export default {
+  computed: {
+    isEnglishLanguage() {
+      return this.$i18n.locale === 'en'; // this will raise and error due $i18n is undefined
+    }
+  }
+};
+```
+do a proper check:
+```js
+export default {
+  computed: {
+    isEnglishLanguage() {
+      return this.$i18n && this.$i18n.locale === 'en'; // this works!
+    }
+  }
+};
+```
+or use `$context`:
+```js
+export default {
+  computed: {
+    isEnglishLanguage() {
+      return this.$context.locale === 'en'; // this works!
+    }
+  }
+};
+```

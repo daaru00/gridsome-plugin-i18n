@@ -6,6 +6,11 @@ import VueI18n from 'vue-i18n'
  * @param options
  */
 export default function (Vue, options, { appOptions }) {
+  // Process only client side
+  if (process.isClient === false) {
+    return
+  }
+  
   // Setup options fallback
   options.defaultLocale = options.defaultLocale || options.locales[0]
   options.fallbackLocale = options.fallbackLocale || options.defaultLocale
