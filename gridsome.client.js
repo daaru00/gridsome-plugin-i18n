@@ -5,9 +5,9 @@ import VueI18n from 'vue-i18n'
  * @param Vue
  * @param options
  */
-export default function (Vue, options, { appOptions }) {
-  // Process only client side
-  if (process.isClient === false) {
+export default function (Vue, options, { appOptions, isServer }) {
+  // Process only client side, if server exit earlier
+  if (isServer === true) {
     return
   }
   
