@@ -1,0 +1,18 @@
+{
+  "name": "gridsome-plugin-i18n",
+  "version": "1.0.0",
+  "description": "Gridsome plugin for i18n",
+  "main": "index.js",
+  "keywords": [
+    "gridsome", "i18n"
+  ],
+  "author": "Fabio Gollinucci <fbgolly@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "gridsome.client.js",
+    "gridsome.server.js"
+  ],
+  "dependencies": {
+    "vue-i18n": "^8.15.5"
+  }
+}
