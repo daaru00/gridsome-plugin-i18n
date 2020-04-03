@@ -53,7 +53,7 @@ A list of all supported locales.
 
 #### messages
 
-- Type: `object` _required_
+- Type: `object`
 
 Declaration of JSON messages files, for more info check [VueI18n's doc](https://kazupon.github.io/vue-i18n/guide/formatting.html).
 
@@ -209,38 +209,33 @@ query($locale:String) {
 </page-query>
 ```
 
-## SSR
+### Hot reload
 
-Vue i18n does not works on server side rendering due an error on plugin's auto-registration:
-> ReferenceError: window is not defined
+When is messages are declared `gridsome.config.js` will be read once during Gridsome startup and will not be watched by webpack dev server (being outside ./dist folder).
 
-Client plugin will not load on client side so do not use `$i18n` variable for evaluation in the component like:
+In order to enable hot reload remove messages from `gridsome.config.js`:
 ```js
-export default {
-  computed: {
-    isEnglishLanguage() {
-      return this.$i18n.locale === 'en'; // this will raise and error due $i18n is undefined
+module.exports = {
+  plugins: [
+    {
+      use: "gridsome-plugin-i18n",
+      options: {
+        // ...
+        messages: {}
+      }
     }
-  }
+  ]
 };
 ```
-do a proper check:
+and load it from `main.js` file:
 ```js
-export default {
-  computed: {
-    isEnglishLanguage() {
-      return this.$i18n && this.$i18n.locale === 'en'; // this works!
-    }
-  }
-};
+export default function (Vue, { appOptions }) {
+  // ...
+  appOptions.i18n.setLocaleMessage('it-it', require('./locales/it-it.json'))
+  appOptions.i18n.setLocaleMessage('fr-fr': require('./locales/fr-fr.json'))
+  appOptions.i18n.setLocaleMessage('de-de': require('./locales/de-de.json'))
+  appOptions.i18n.setLocaleMessage('en-gb': require('./locales/en-gb.json'))
+}
 ```
-or use `$context`:
-```js
-export default {
-  computed: {
-    isEnglishLanguage() {
-      return this.$context.locale === 'en'; // this works!
-    }
-  }
-};
-```
+this will use i18n [setLocaleMessage](https://kazupon.github.io/vue-i18n/api/#setlocalemessage-locale-message) API to load message from client side. 
+Now messages files are included in webpack bundle and a file change will trigger a page reload having a better development experience.
