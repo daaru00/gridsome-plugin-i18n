@@ -12,7 +12,8 @@
   },
   "homepage": "https://github.com/daaru00/gridsome-plugin-i18n#readme",
   "keywords": [
-    "gridsome", "i18n"
+    "gridsome",
+    "i18n"
   ],
   "author": "Fabio Gollinucci <fbgolly@gmail.com>",
   "license": "MIT",

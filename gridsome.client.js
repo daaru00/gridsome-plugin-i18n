@@ -20,7 +20,7 @@ export default function (Vue, options, { appOptions, isServer }) {
   const i18n = new VueI18n(Object.assign(options, {
     locale: options.defaultLocale
   }))
-  appOptions.i18n = i18n  
+  appOptions.i18n = i18n
 
   // Create mixin to load locale base on context
   Vue.mixin({
