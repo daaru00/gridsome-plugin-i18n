@@ -1,12 +1,32 @@
-name: NPM Publish
+name: Create Release
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - '*'
 
 jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Get version tag
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Create Release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: Version ${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+
   publish-npm:
-    name: "Publish NPM package"
+    name: "Publish to NPM"
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -23,6 +43,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
   publish-gpr:
+    name: "Publish to GitHub Packages"
     needs: build
     runs-on: ubuntu-latest
     steps:
