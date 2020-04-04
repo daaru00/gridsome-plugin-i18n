@@ -5,18 +5,13 @@ import VueI18n from 'vue-i18n'
  * @param Vue
  * @param options
  */
-export default function (Vue, options, { appOptions, isServer }) {
-  // Process only client side, if server exit earlier
-  if (isServer === true) {
-    return
-  }
-  
+export default function (Vue, options, { appOptions, router }) {  
   // Setup options fallback
   options.defaultLocale = options.defaultLocale || options.locales[0]
   options.fallbackLocale = options.fallbackLocale || options.defaultLocale
 
-  // Create i18n plugin
-  window.Vue = Vue
+  // Add VueI18n plugin to Vue instance
+  Vue.use(VueI18n)
   const i18n = new VueI18n(Object.assign(options, {
     locale: options.defaultLocale
   }))
@@ -25,11 +20,13 @@ export default function (Vue, options, { appOptions, isServer }) {
   // Create mixin to load locale base on context
   Vue.mixin({
     created: function () {
-      if (this.$context && this.$context.locale) {
-        const currentLocaleCode = this.$context.locale
-        if (i18n.locale !== currentLocaleCode) {
-          i18n.locale = currentLocaleCode
-        }
+      if (process.isServer && !this.$ssrContext) {
+        // something does not works here..
+        return
+      }
+      const currentLocaleCode = this.$context.locale
+      if (i18n.locale !== currentLocaleCode) {
+        i18n.locale = currentLocaleCode
       }
     }
   })
