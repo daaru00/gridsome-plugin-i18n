@@ -273,6 +273,36 @@ then you have to properly add path prefix:
 ```
 (read more about `$tp` helper in next section)
 
+### Locale switcher components
+
+Here an example of a Vue component to switch locale, creating into `./src/components/LocaleSwitcher.vue`:
+```html
+<template>
+  <select v-model="currentLocale" @change="localeChanged">
+    <option v-for="locale in availableLocales" :key="locale" :value="locale">{{ locale }}</option>
+  </select>
+</template>
+
+<script>
+export default {
+  name: "LocaleSwitcher",
+  data: function () {
+    return {
+      currentLocale: this.$i18n.locale.toString(),
+      availableLocales: this.$i18n.availableLocales
+    }
+  },
+  methods: {
+    localeChanged () {
+      this.$router.push({
+        path: this.$tp(this.$route.path, this.currentLocale, true)
+      })
+    }
+  }
+}
+</script>
+```
+
 ## Vue instance helpers
 
 #### $tp
@@ -300,3 +330,21 @@ after build become:
 ```html
 <a href="/en/projects/">Projects</a>
 ```
+
+It's also possible to select which locale to use during translation passing to second string parameter:
+```js
+const localizedPath = this.$tp('/projects/', 'fr-fr')
+// localizedPath is "/fr/projects/"
+```
+this will not works when path is already translated:
+```js
+const localizedPath = this.$tp('/it/projects/', 'fr-fr')
+// localizedPath is "/it/projects/" <--- not changed
+```
+
+To force changing locale add a third boolean parameter:
+```js
+const localizedPath = this.$tp('/it/projects/', 'fr-fr', true)
+// localizedPath is "/fr/projects/"
+```
+useful to language selector implementation.

@@ -18,9 +18,9 @@ export default function (Vue, options, { appOptions, router }) {
   appOptions.i18n = i18n
 
   // Translate path to correct
-  function translatePath(pathToResolve) {
-    const currentLocale = i18n.locale
-    if (!currentLocale) {
+  function translatePath(pathToResolve, targetLocale, forceChange) {
+    targetLocale = targetLocale || i18n.locale
+    if (!targetLocale) {
       return pathToResolve
     }
 
@@ -28,7 +28,7 @@ export default function (Vue, options, { appOptions, router }) {
     if (!pathToResolve.startsWith('/')) {
       pathToResolve = '/' + pathToResolve
     }
-    const pathSegment = options.pathAliases[currentLocale] || currentLocale
+    const pathSegment = options.pathAliases[targetLocale] || targetLocale
     const pathPrefix = '/' + pathSegment
 
     // if path already contain path prefix skip rewrite
@@ -39,12 +39,21 @@ export default function (Vue, options, { appOptions, router }) {
       return pathToResolveSegments[1] === pathSegment
     })
 
-    if (pathToResolveLocale !== undefined) {
-      return pathToResolve
+    if (pathToResolveLocale !== undefined){
+      if (forceChange !== true) {
+        return pathToResolve
+      }
+      pathToResolve = pathToResolveSegments.slice(2).join('/')
+      if (!pathToResolve.startsWith('/')) {
+        pathToResolve = '/' + pathToResolve
+      }
     }
 
     return pathPrefix + pathToResolve
   }
+
+  // Add translate path helper
+  Vue.prototype.$tp = translatePath
 
   // Change locale based on route meta tag
   router.beforeEach((to, from, next) => {
@@ -81,7 +90,4 @@ export default function (Vue, options, { appOptions, router }) {
       path: translatePath(to.path || '/')
     })
   })
-
-  // Add translate path helper
-  Vue.prototype.$tp = translatePath
 }
