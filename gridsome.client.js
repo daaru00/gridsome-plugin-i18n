@@ -17,20 +17,6 @@ export default function (Vue, options, { appOptions, router }) {
   }))
   appOptions.i18n = i18n
 
-  // Create mixin to load locale base on context
-  Vue.mixin({
-    created: function () {
-      if (process.isServer && !this.$ssrContext) {
-        // something does not works here..
-        return
-      }
-      const currentLocaleCode = this.$context.locale
-      if (i18n.locale !== currentLocaleCode) {
-        i18n.locale = currentLocaleCode
-      }
-    }
-  })
-
   // Translate path to correct
   function translatePath(pathToResolve) {
     const currentLocale = i18n.locale
@@ -59,6 +45,15 @@ export default function (Vue, options, { appOptions, router }) {
 
     return pathPrefix + pathToResolve
   }
+
+  // Change locale based on route meta tag
+  router.beforeEach((to, from, next) => {
+    // Change locale
+    if ((to.meta && to.meta.locale) && to.meta.locale !== i18n.locale) {
+      i18n.locale = to.meta.locale
+    }
+    next()
+  })
 
   // Maintain path prefix during router change
   router.beforeResolve((to, from, next) => {
