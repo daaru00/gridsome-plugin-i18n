@@ -9,9 +9,13 @@ Clone this repository:
 ```bash
 git clone git@github.com:daaru00/gridsome-plugin-i18n.git
 ```
-then enter into directory and create a NPM link:
+then enter into directory and instal NPM dependencies:
 ```bash
 cd gridsome-plugin-i18n
+npm install
+```
+finally create a NPM link:
+```bash
 sudo npm link
 ```
 
@@ -25,6 +29,7 @@ Install plugin using NPM link:
 ```
 npm link gridsome-plugin-i18n
 ```
+NOTE: link will be erased when you run a `npm install` or `npm update`, re-run `npm link gridsome-plugin-i18n` command to restore link.
 
 Add Gridsome i18n plugin configuration into `gridsome.config.js`:
 ```js
