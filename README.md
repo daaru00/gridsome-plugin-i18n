@@ -250,11 +250,11 @@ Now messages files are included in webpack bundle and a file change will trigger
 
 This plugin will add an additional logic to Vue Router when resolving paths, for example is you are using a link like this:
 ```html
-<g-link class="nav-link" to="/projects/">Projects</g-link>
+<g-link to="/projects/">Projects</g-link>
 ```
 the resolved route will be found checking for current locale set and add the appropriate path prefix like `/en/projects/`.
 
-Is possible to disable this feature and manage routing on your own:
+It's possible to disable this feature and manage routing on your own:
 ```js
 module.exports = {
   plugins: [
@@ -269,5 +269,34 @@ module.exports = {
 ```
 then you have to properly add path prefix:
 ```html
-<g-link class="nav-link" :to="`${$i18n.locale}/projects/`">Projects</g-link>
+<g-link :to="$tp('/projects/')">Projects</g-link>
+```
+(read more about `$tp` helper in next section)
+
+## Vue instance helpers
+
+#### $tp
+
+Is a function that accept a path as arguments and return a localized prefixed path version.
+```js
+// this.$i18n.locale is "en-gp"
+const localizedPath = this.$tp('/projects/')
+// localizedPath is "/en/projects/"
+```
+
+If a localized path prefix is already set it will returns the same path:
+```js
+// this.$i18n.locale is "en-gp"
+const localizedPath = this.$tp('/it/projects/')
+// localizedPath is "/it/projects/"
+```
+this in order to not create redirect loop.
+
+This is useful for render a correct path for builded `<g-link>` directives:
+```html
+<g-link :to="$tp('/projects/')">Projects</g-link>
+```
+after build become:
+```html
+<a href="/en/projects/">Projects</a>
 ```

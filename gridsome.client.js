@@ -31,29 +31,14 @@ export default function (Vue, options, { appOptions, router }) {
     }
   })
 
-  // Maintain path prefix during router change
-  router.beforeResolve((to, from, next) => {
-    // do not rewrite build paths
-    if (process.isServer) {
-      next()
-      return 
-    }
-
-    // if option is disabled, skip whole logic
-    if (options.enablePathRewrite === false) {
-      next()
-      return 
-    }
-
-    // if is first page load, skip whole logic
+  // Translate path to correct
+  function translatePath(pathToResolve) {
     const currentLocale = i18n.locale
     if (!currentLocale) {
-      next()
-      return 
+      return pathToResolve
     }
 
-    // Elaborate path prefix
-    let pathToResolve = to.path || '/'
+    // Check path segments
     if (!pathToResolve.startsWith('/')) {
       pathToResolve = '/' + pathToResolve
     }
@@ -67,16 +52,41 @@ export default function (Vue, options, { appOptions, router }) {
       // First element is an empty string, second is the first path segment
       return pathToResolveSegments[1] === pathSegment
     })
-    
-    // Path already contain a valid locale prefix, skip rewrite
+
     if (pathToResolveLocale !== undefined) {
+      return pathToResolve
+    }
+
+    return pathPrefix + pathToResolve
+  }
+
+  // Maintain path prefix during router change
+  router.beforeResolve((to, from, next) => {
+    // do not rewrite build paths
+    if (process.isServer) {
       next()
-      return
+      return 
+    }
+
+    // if option is disabled skip whole logic
+    if (options.enablePathRewrite === false) {
+      next()
+      return 
+    }
+
+    const translatedPath = translatePath(to.path || '/')
+    // If path is has valid locale prefix skip rewrite
+    if (translatedPath === to.path) {
+      next()
+      return 
     }
 
     // Rewrite path
     next({
-      path: pathPrefix + pathToResolve
+      path: translatePath(to.path || '/')
     })
   })
+
+  // Add translate path helper
+  Vue.prototype.$tp = translatePath
 }
