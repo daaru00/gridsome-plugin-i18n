@@ -25,6 +25,7 @@ class VueI18n {
     this.options = options
     this.options.defaultLocale = options.defaultLocale || options.locales[0]
     api.createManagedPages(this.createManagedPages.bind(this))
+    api._app.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
   }
 
   /**
@@ -48,6 +49,11 @@ class VueI18n {
           component: route.component,
           context: {
             locale:  `${locale}`
+          },
+          route:{
+            meta: {
+              locale:  `${locale}`
+            }
           }
         })
       }
@@ -59,9 +65,30 @@ class VueI18n {
         component: route.component,
         context: Object.assign(oldPage.context || {}, {
           locale: this.options.defaultLocale
-        })
+        }),
+        route:{
+          meta: {
+            locale:  this.options.defaultLocale
+          }
+        }
       })
     }
+  }
+
+  /**
+   * Hook into create route process
+   * 
+   * @param {*} options
+   */
+  createRouteHook(options) {
+    const meta = options.internal.meta
+    if (meta && meta.locale) {
+      if (options.name === '404' && options.path !== '/404/') {
+        options.name = `${options.name}__${meta.locale}`
+      }
+    }
+
+    return options
   }
 
 }
