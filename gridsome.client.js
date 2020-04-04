@@ -30,4 +30,39 @@ export default function (Vue, options, { appOptions, router }) {
       }
     }
   })
+
+  // Maintain path prefix during router change
+  router.beforeResolve((to, from, next) => {
+    // if option is disabled skip logic
+    if (options.enablePathRewrite === false) {
+      next()
+      return 
+    }
+
+    // if is first page load skip logic
+    const currentLocale = i18n.locale
+    if (!currentLocale) {
+      next()
+      return 
+    }
+
+    // Elaborate path prefix
+    const pathSegment = options.pathAliases[currentLocale] || currentLocale
+    let pathToResolve = to.path || '/'
+    if (!pathToResolve.startsWith('/')) {
+      pathToResolve = '/' + pathToResolve
+    }
+    const pathPrefix = '/' + pathSegment
+
+    // if path already contain path prefix skip rewrite
+    if (pathToResolve.startsWith(pathPrefix)) {
+      next()
+      return
+    }    
+
+    // Rewrite path
+    next({
+      path: pathPrefix + pathToResolve
+    })
+  })
 }

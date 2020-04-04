@@ -75,6 +75,12 @@ Language to use when your preferred language lacks a translation, for more info 
 
 Default locale to use in page's path without locale segment in it.
 
+#### enablePathRewrite
+
+- Type: `boolean`
+
+Enable automatic rewrite of path for Vue Router.
+
 ## Usage
 
 This plugin will install and configure [Vue I18n](https://kazupon.github.io/vue-i18n/introduction.html), so refer to it about usage.
@@ -239,3 +245,29 @@ export default function (Vue, { appOptions }) {
 ```
 this will use i18n [setLocaleMessage](https://kazupon.github.io/vue-i18n/api/#setlocalemessage-locale-message) API to load message from client side. 
 Now messages files are included in webpack bundle and a file change will trigger a page reload having a better development experience.
+
+### Link routing integration
+
+This plugin will add an additional logic to Vue Router when resolving paths, for example is you are using a link like this:
+```html
+<g-link class="nav-link" to="/projects/">Projects</g-link>
+```
+the resolved route will be found checking for current locale set and add the appropriate path prefix like `/en/projects/`.
+
+Is possible to disable this feature and manage routing on your own:
+```js
+module.exports = {
+  plugins: [
+    {
+      use: "gridsome-plugin-i18n",
+      options: {
+        enablePathRewrite: false
+      }
+    }
+  ]
+};
+```
+then you have to properly add path prefix:
+```html
+<g-link class="nav-link" :to="`${$i18n.locale}/projects/`">Projects</g-link>
+```
