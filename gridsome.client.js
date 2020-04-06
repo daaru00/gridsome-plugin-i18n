@@ -1,11 +1,11 @@
 import VueI18n from 'vue-i18n'
 /**
  * i18n client plugin initialization
- * 
+ *
  * @param Vue
  * @param options
  */
-export default function (Vue, options, { appOptions, router }) {  
+export default function (Vue, options, { appOptions, router, head }) {
   // Setup options fallback
   options.defaultLocale = options.defaultLocale || options.locales[0]
   options.fallbackLocale = options.fallbackLocale || options.defaultLocale
@@ -46,6 +46,14 @@ export default function (Vue, options, { appOptions, router }) {
       pathToResolve = pathToResolveSegments.slice(2).join('/')
       if (!pathToResolve.startsWith('/')) {
         pathToResolve = '/' + pathToResolve
+      }
+
+      // Set the correct lang attribute for html tag using the current locale
+      if (options.pathAliases) {
+        const pathAlias = options.pathAliases[i18n.locale];
+        const lang = pathAlias || options.defaultLocale;
+
+        head.htmlAttrs = { lang: lang };
       }
     }
 
