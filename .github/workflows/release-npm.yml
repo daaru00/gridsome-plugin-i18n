@@ -27,7 +27,6 @@ jobs:
 
   publish-npm:
     name: "Publish to NPM"
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout source code"
@@ -44,7 +43,6 @@ jobs:
 
   publish-gpr:
     name: "Publish to GitHub Packages"
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout source code"
