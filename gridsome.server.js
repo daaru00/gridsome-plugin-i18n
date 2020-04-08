@@ -7,9 +7,10 @@ class VueI18n {
   static defaultOptions () {
     return {
       locales: [],
-      pathAliases: [],
+      messages: {},
+      pathAliases: {},
       defaultLocale: null,
-      i18n: {}
+      enablePathRewrite: true
     }
   }
 

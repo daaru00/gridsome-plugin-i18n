@@ -75,6 +75,12 @@ Language to use when your preferred language lacks a translation, for more info 
 
 Default locale to use in page's path without locale segment in it.
 
+#### enablePathRewrite
+
+- Type: `boolean`
+
+Enable automatic rewrite of path for Vue Router.
+
 ## Usage
 
 This plugin will install and configure [Vue I18n](https://kazupon.github.io/vue-i18n/introduction.html), so refer to it about usage.
@@ -239,3 +245,106 @@ export default function (Vue, { appOptions }) {
 ```
 this will use i18n [setLocaleMessage](https://kazupon.github.io/vue-i18n/api/#setlocalemessage-locale-message) API to load message from client side. 
 Now messages files are included in webpack bundle and a file change will trigger a page reload having a better development experience.
+
+### Link routing integration
+
+This plugin will add an additional logic to Vue Router when resolving paths, for example is you are using a link like this:
+```html
+<g-link to="/projects/">Projects</g-link>
+```
+the resolved route will be found checking for current locale set and add the appropriate path prefix like `/en/projects/`.
+
+It's possible to disable this feature and manage routing on your own:
+```js
+module.exports = {
+  plugins: [
+    {
+      use: "gridsome-plugin-i18n",
+      options: {
+        enablePathRewrite: false
+      }
+    }
+  ]
+};
+```
+then you have to properly add path prefix:
+```html
+<g-link :to="$tp('/projects/')">Projects</g-link>
+```
+(read more about `$tp` helper in next section)
+
+### Locale switcher components
+
+Here an example of a Vue component to switch locale, creating into `./src/components/LocaleSwitcher.vue`:
+```html
+<template>
+  <select v-model="currentLocale" @change="localeChanged">
+    <option v-for="locale in availableLocales" :key="locale" :value="locale">{{ locale }}</option>
+  </select>
+</template>
+
+<script>
+export default {
+  name: "LocaleSwitcher",
+  data: function () {
+    return {
+      currentLocale: this.$i18n.locale.toString(),
+      availableLocales: this.$i18n.availableLocales
+    }
+  },
+  methods: {
+    localeChanged () {
+      this.$router.push({
+        path: this.$tp(this.$route.path, this.currentLocale, true)
+      })
+    }
+  }
+}
+</script>
+```
+
+## Vue instance helpers
+
+#### $tp
+
+Is a function that accept a path as arguments and return a localized prefixed path version.
+```js
+// this.$i18n.locale is "en-gp"
+const localizedPath = this.$tp('/projects/')
+// localizedPath is "/en/projects/"
+```
+
+If a localized path prefix is already set it will returns the same path:
+```js
+// this.$i18n.locale is "en-gp"
+const localizedPath = this.$tp('/it/projects/')
+// localizedPath is "/it/projects/"
+```
+this in order to not create redirect loop.
+
+This is useful for render a correct path for builded `<g-link>` directives:
+```html
+<g-link :to="$tp('/projects/')">Projects</g-link>
+```
+after build become:
+```html
+<a href="/en/projects/">Projects</a>
+```
+
+It's also possible to select which locale to use during translation passing to second string parameter:
+```js
+const localizedPath = this.$tp('/projects/', 'fr-fr')
+// localizedPath is "/fr/projects/"
+```
+this will not works when path is already translated:
+```js
+const localizedPath = this.$tp('/it/projects/', 'fr-fr')
+// localizedPath is "/it/projects/" <--- not changed
+```
+
+To force changing locale add a third boolean parameter:
+```js
+const localizedPath = this.$tp('/it/projects/', 'fr-fr', true)
+// localizedPath is "/fr/projects/"
+```
+useful to language selector implementation.
