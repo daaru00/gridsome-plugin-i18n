@@ -24,6 +24,15 @@ export default function (Vue, options, { appOptions, router, head }) {
       return pathToResolve
     }
 
+    // Disable rewrite for default language
+    if (
+      targetLocale === options.defaultLocale && 
+      options.rewriteDefaultLanguage === false && 
+      !forceChange
+    ) {
+      return pathToResolve
+    }
+
     // Check path segments
     if (!pathToResolve.startsWith('/')) {
       pathToResolve = '/' + pathToResolve

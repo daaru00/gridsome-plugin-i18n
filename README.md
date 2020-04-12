@@ -72,14 +72,23 @@ Language to use when your preferred language lacks a translation, for more info 
 #### defaultLocale
 
 - Type: `string`
+- Default: first locale
 
 Default locale to use in page's path without locale segment in it.
 
 #### enablePathRewrite
 
 - Type: `boolean`
+- Default: `true`
 
 Enable automatic rewrite of path for Vue Router.
+
+#### rewriteDefaultLanguage
+
+- Type: `boolean`
+- Default: `true`
+
+Enable path rewrite for default language
 
 ## Usage
 
