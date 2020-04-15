@@ -47,14 +47,6 @@ export default function (Vue, options, { appOptions, router, head }) {
       if (!pathToResolve.startsWith('/')) {
         pathToResolve = '/' + pathToResolve
       }
-
-      // Set the correct lang attribute for html tag using the current locale
-      if (options.pathAliases) {
-        const pathAlias = options.pathAliases[i18n.locale];
-        const lang = pathAlias || options.defaultLocale;
-
-        head.htmlAttrs = { lang: lang };
-      }
     }
 
     return pathPrefix + pathToResolve
@@ -72,30 +64,48 @@ export default function (Vue, options, { appOptions, router, head }) {
     next()
   })
 
-  // Maintain path prefix during router change
+  function conditionalLangAttrUpdate(updateFunction) {
+    if (options.pathAliases) {
+      const pathAlias = options.pathAliases[i18n.locale];
+      const lang = pathAlias || options.defaultLocale;
+
+      updateFunction(lang);
+    }
+  }
+
+// Maintain path prefix during router change
   router.beforeResolve((to, from, next) => {
     // do not rewrite build paths
     if (process.isServer) {
       next()
-      return 
+      return
     }
 
     // if option is disabled skip whole logic
     if (options.enablePathRewrite === false) {
       next()
-      return 
+      return
     }
+
+    // On route load, set the correct lang attribute for html tag using the current locale
+    conditionalLangAttrUpdate((lang) => head.htmlAttrs = {lang: lang});
 
     const translatedPath = translatePath(to.path || '/')
     // If path is has valid locale prefix skip rewrite
     if (translatedPath === to.path) {
       next()
-      return 
+      return
     }
 
     // Rewrite path
     next({
       path: translatePath(to.path || '/')
     })
+  })
+
+  // Update the lang attribute on each route change:
+  // head.htmlAttrs = { 'lang' : lang } doesn't seem to work dynamically here, only on page change or refresh
+  router.afterEach(() => {
+    conditionalLangAttrUpdate((lang) => document.documentElement.setAttribute('lang', lang))
   })
 }
