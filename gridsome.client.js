@@ -52,12 +52,24 @@ export default function (Vue, options, { appOptions, router, head }) {
       if (forceChange !== true) {
         return pathToResolve
       }
+      if (pathToResolveSegments.length === 0) {
+        return '/'
+      }
       pathToResolve = pathToResolveSegments.slice(2).join('/')
       if (!pathToResolve.startsWith('/')) {
         pathToResolve = '/' + pathToResolve
       }
     }
 
+    // Skip adding prefix to default locale
+    if (
+      targetLocale === options.defaultLocale && 
+      options.rewriteDefaultLanguage === false
+    ) {
+      return pathToResolve
+    }
+
+    // Add locale prefix
     return pathPrefix + pathToResolve
   }
 
@@ -82,29 +94,25 @@ export default function (Vue, options, { appOptions, router, head }) {
   router.beforeResolve((to, from, next) => {
     // do not rewrite build paths
     if (process.isServer) {
-      next()
-      return
+      return next()
     }
 
     // if option is disabled skip whole logic
     if (options.enablePathRewrite === false) {
-      next()
-      return
+      return next()
     }
 
     // On route load, set the correct lang attribute for html tag using the current locale
     conditionalLangAttrUpdate((lang) => Object.assign(head.htmlAttrs, {lang: lang}));
 
     const translatedPath = translatePath(to.path || '/')
-    // If path is has valid locale prefix skip rewrite
     if (translatedPath === to.path) {
-      next()
-      return
+      return next()
     }
 
     // Rewrite path
     next({
-      path: translatePath(to.path || '/')
+      path: translatedPath
     })
   })
 
