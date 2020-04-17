@@ -45,7 +45,7 @@ class VueI18n {
         // Create a page clone on a path with locale segment
         const pathSegment = this.options.pathAliases[locale] || locale
         createPage({
-          path: path.join(`/${pathSegment}/`, route.path),
+          path: this.mergePathParts(pathSegment, route.path),
           component: route.component,
           context: Object.assign({}, page.context, {
             locale:  `${locale}`
@@ -73,6 +73,39 @@ class VueI18n {
         }
       })
     }
+  }
+
+  /**
+   * Merge paths parts into one
+   * 
+   * @param {string} parts multiple arguments
+   * @returns {string}
+   */
+  mergePathParts() {
+    const pathParts = []
+    for (var i = 0; i < arguments.length; i++) {
+      let pathPart = arguments[i];
+      // skip home
+      if (pathPart === '/') {
+        continue
+      }
+      // clean leading slash
+      if (pathPart.endsWith('/')) {
+        pathPart = pathPart.substring(0, pathPart.length - 1)
+      }
+      // clean trailing slash
+      if (pathPart.startsWith('/')) {
+        pathPart = pathPart.substring(1, pathPart.length)
+      }
+      // check if remain somethings
+      pathParts.push(pathPart)
+    }
+    // defending from request to merge / and /
+    if (pathParts.length === 0) {
+      return '/'
+    }
+    // ensure leading and trailing slashes
+    return '/' + pathParts.join('/') + '/'
   }
 
   /**
