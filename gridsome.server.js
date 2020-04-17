@@ -47,9 +47,9 @@ class VueI18n {
         createPage({
           path: path.join(`/${pathSegment}/`, route.path),
           component: route.component,
-          context: {
+          context: Object.assign(page.context, {
             locale:  `${locale}`
-          },
+          }),
           route:{
             meta: {
               locale:  `${locale}`
