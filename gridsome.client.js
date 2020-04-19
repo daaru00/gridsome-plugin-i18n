@@ -101,7 +101,9 @@ export default function (Vue, options, { appOptions, router, head }) {
 
   // Update the lang attribute on each route change:
   // head.htmlAttrs = { 'lang' : lang } doesn't seem to work dynamically here, only on page change or refresh
-  router.afterEach(() => {
-    conditionalLangAttrUpdate((lang) => document.documentElement.setAttribute('lang', lang))
-  })
+  if (process.isClient) {
+    router.afterEach(() => {
+      conditionalLangAttrUpdate((lang) => document.documentElement.setAttribute('lang', lang))
+    })
+  }
 }
