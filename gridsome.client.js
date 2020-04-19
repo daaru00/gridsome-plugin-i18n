@@ -65,12 +65,8 @@ export default function (Vue, options, { appOptions, router, head }) {
   })
 
   function conditionalLangAttrUpdate(updateFunction) {
-    if (options.pathAliases) {
-      const pathAlias = options.pathAliases[i18n.locale];
-      const lang = pathAlias || options.defaultLocale;
-
+      const lang = i18n.locale || options.defaultLocale;
       updateFunction(lang);
-    }
   }
 
 // Maintain path prefix during router change
