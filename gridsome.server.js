@@ -47,7 +47,7 @@ class VueI18n {
         createPage({
           path: path.join(`/${pathSegment}/`, route.path),
           component: route.component,
-          context: Object.assign(page.context, {
+          context: Object.assign({}, page.context, {
             locale:  `${locale}`
           }),
           route:{
@@ -63,7 +63,7 @@ class VueI18n {
       createPage({
         path: oldPage.path,
         component: route.component,
-        context: Object.assign(oldPage.context || {}, {
+        context: Object.assign({}, oldPage.context || {}, {
           locale: this.options.defaultLocale
         }),
         route:{
