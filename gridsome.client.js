@@ -84,7 +84,7 @@ export default function (Vue, options, { appOptions, router, head }) {
     }
 
     // On route load, set the correct lang attribute for html tag using the current locale
-    conditionalLangAttrUpdate((lang) => head.htmlAttrs = {lang: lang});
+    conditionalLangAttrUpdate((lang) => Object.assign(head.htmlAttrs, {lang: lang}));
 
     const translatedPath = translatePath(to.path || '/')
     // If path is has valid locale prefix skip rewrite
