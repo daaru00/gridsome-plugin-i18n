@@ -66,7 +66,7 @@ class VueI18n {
       }
       // Set default locale on pages without locale segment
       const oldPage = Object.assign({}, page)
-      removePage(page)
+      removePage(page.id)
       createPage({
         path: oldPage.path,
         component: route.component,
