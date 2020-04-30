@@ -1,11 +1,11 @@
 import VueI18n from 'vue-i18n'
 /**
  * i18n client plugin initialization
- * 
+ *
  * @param Vue
  * @param options
  */
-export default function (Vue, options, { appOptions, router }) {  
+export default function (Vue, options, { appOptions, router, head }) {
   // Setup options fallback
   options.defaultLocale = options.defaultLocale || options.locales[0]
   options.fallbackLocale = options.fallbackLocale || options.defaultLocale
@@ -64,25 +64,33 @@ export default function (Vue, options, { appOptions, router }) {
     next()
   })
 
-  // Maintain path prefix during router change
+  function conditionalLangAttrUpdate(updateFunction) {
+      const lang = i18n.locale || options.defaultLocale;
+      updateFunction(lang);
+  }
+
+// Maintain path prefix during router change
   router.beforeResolve((to, from, next) => {
     // do not rewrite build paths
     if (process.isServer) {
       next()
-      return 
+      return
     }
 
     // if option is disabled skip whole logic
     if (options.enablePathRewrite === false) {
       next()
-      return 
+      return
     }
+
+    // On route load, set the correct lang attribute for html tag using the current locale
+    conditionalLangAttrUpdate((lang) => Object.assign(head.htmlAttrs, {lang: lang}));
 
     const translatedPath = translatePath(to.path || '/')
     // If path is has valid locale prefix skip rewrite
     if (translatedPath === to.path) {
       next()
-      return 
+      return
     }
 
     // Rewrite path
@@ -90,4 +98,12 @@ export default function (Vue, options, { appOptions, router }) {
       path: translatePath(to.path || '/')
     })
   })
+
+  // Update the lang attribute on each route change:
+  // head.htmlAttrs = { 'lang' : lang } doesn't seem to work dynamically here, only on page change or refresh
+  if (process.isClient) {
+    router.afterEach(() => {
+      conditionalLangAttrUpdate((lang) => document.documentElement.setAttribute('lang', lang))
+    })
+  }
 }
