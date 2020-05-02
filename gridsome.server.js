@@ -24,8 +24,9 @@ class VueI18n {
     this.pages = api._app.pages
     this.options = options
     this.options.defaultLocale = options.defaultLocale || options.locales[0]
-    api.createManagedPages(this.createManagedPages.bind(this))
     api._app.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
+    api._app.pages.hooks.pageContext.tap('i18n', this.createPageHook.bind(this))
+    api.createManagedPages(this.createManagedPages.bind(this))
   }
 
   /**
@@ -33,9 +34,8 @@ class VueI18n {
    * 
    * @param {function} param.findPages
    * @param {function} param.createPage
-   * @param {function} param.removePage
    */
-  createManagedPages({ findPages, createPage, removePage }) {
+  createManagedPages({ findPages, createPage }) {
     // List all pages
     const pages = findPages();
     for (const page of pages) {
@@ -64,21 +64,6 @@ class VueI18n {
           }
         })
       }
-      // Set default locale on pages without locale segment
-      const oldPage = Object.assign({}, page)
-      removePage(page.id)
-      createPage({
-        path: oldPage.path,
-        component: route.component,
-        context: Object.assign({}, oldPage.context || {}, {
-          locale: this.options.defaultLocale
-        }),
-        route:{
-          meta: {
-            locale:  this.options.defaultLocale
-          }
-        }
-      })
     }
   }
 
@@ -128,7 +113,20 @@ class VueI18n {
       }
     }
 
+    if (!meta.locale) {
+      options.internal.meta.locale = this.options.defaultLocale
+    }
+
     return options
+  }
+
+  /**
+   * Hook into create page process
+   * 
+   * @param {*} options
+   */
+  createPageHook(context) {
+    context.locale = this.options.defaultLocale
   }
 
 }
