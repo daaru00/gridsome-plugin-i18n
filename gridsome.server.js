@@ -35,7 +35,7 @@ class VueI18n {
    * @param {function} param.createPage
    * @param {function} param.removePage
    */
-  createManagedPages({ findPages, createPage, removePage }) {
+  createManagedPages({ findPages, createPage, removePageByPath }) {
     // List all pages
     const pages = findPages();
     for (const page of pages) {
@@ -59,7 +59,7 @@ class VueI18n {
       }
       // Set default locale on pages without locale segment
       const oldPage = Object.assign({}, page)
-      removePage(page)
+      removePageByPath(oldPage.path)
       createPage({
         path: oldPage.path,
         component: route.component,
