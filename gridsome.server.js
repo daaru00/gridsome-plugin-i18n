@@ -42,6 +42,13 @@ class VueI18n {
       // Load page's route
       const route = this.pages.getRoute(page.internal.route)
       for (const locale of this.options.locales) {
+        // Skip generation for default language
+        if (
+          locale === this.options.defaultLocale && 
+          this.options.rewriteDefaultLanguage === false
+        ) {
+          continue
+        }
         // Create a page clone on a path with locale segment
         const pathSegment = this.options.pathAliases[locale] || locale
         createPage({

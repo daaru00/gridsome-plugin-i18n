@@ -31,6 +31,8 @@ module.exports = {
         },
         fallbackLocale: 'en-gb', // fallback language
         defaultLocale: 'en-gb', // default language
+        enablePathRewrite: true, // rewrite path with locale prefix, default: true
+        rewriteDefaultLanguage: true, // rewrite default locale, default: true
         messages: {
           'it-it': require('./src/locales/it-it.json'), // Messages files
           'fr-fr': require('./src/locales/fr-fr.json'),
@@ -72,14 +74,23 @@ Language to use when your preferred language lacks a translation, for more info 
 #### defaultLocale
 
 - Type: `string`
+- Default: first locale
 
 Default locale to use in page's path without locale segment in it.
 
 #### enablePathRewrite
 
 - Type: `boolean`
+- Default: `true`
 
 Enable automatic rewrite of path for Vue Router.
+
+#### rewriteDefaultLanguage
+
+- Type: `boolean`
+- Default: `true`
+
+Enable path rewrite for default language
 
 ## Usage
 
