@@ -126,9 +126,10 @@ class VueI18n {
     }
 
     if (!meta.locale) {
+      // FIXME: this currently not working, using i18n internal fallback
       options.internal.meta.locale = this.options.defaultLocale
     }
-    
+
     return options
   }
 
