@@ -40,7 +40,7 @@ class VueI18n {
   createManagedPages({ findPages, createPage, removePage }) {
     
     // Create custom localized routes using the this.options.routes object
-    if (this.options.routes) {
+    if (this.options.enablePathGeneration === false && this.options.routes) {
       this.options.routes.forEach(route => {
         createPage({
           path: route.path,
