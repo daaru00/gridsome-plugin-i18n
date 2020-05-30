@@ -26,6 +26,7 @@ class VueI18n {
     this.pageToGenerate = []
     this.options.defaultLocale = options.defaultLocale || options.locales[0]
     api._app.pages.hooks.createPage.tap('i18n', this.createPageHook.bind(this))
+    api._app.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
     api.createManagedPages(this.createManagedPages.bind(this))
   }
 
@@ -87,7 +88,7 @@ class VueI18n {
     options.context.locale = this.options.defaultLocale
 
     // Retrieve current route
-    const route = this.pages.getRoute(options.internal.route)    
+    const route = this.pages.getRoute(options.internal.route)
 
     // Create a page clone on a path with locale segment
     for (const locale of this.options.locales) {
@@ -100,13 +101,34 @@ class VueI18n {
         }),
         route: {
           name: route.name ? `${route.name}__${locale}` : undefined,
-          meta: Object.assign(options.meta || {},{
+          meta: Object.assign({}, options.meta || {},{
             locale:  `${locale}`
           })
         },
+        queryVariables: options.internal.queryVariables
       })
     }
 
+    return options
+  }
+
+  /**
+   * Hook into create route process
+   * 
+   * @param {*} options
+   */
+  createRouteHook(options) {
+    const meta = options.internal.meta
+    if (meta && meta.locale) {
+      if (options.name === '404' && options.path !== '/404/') {
+        options.name = `${options.name}__${meta.locale}`
+      }
+    }
+
+    if (!meta.locale) {
+      options.internal.meta.locale = this.options.defaultLocale
+    }
+    
     return options
   }
 
