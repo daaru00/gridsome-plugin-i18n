@@ -61,7 +61,7 @@ class VueI18n {
     }
 
     // Disallow the automatic creation of the localized routes
-    if (!this.options.enablePathGeneration) return;
+    if (this.options.enablePathGeneration === false) return;
     
     // List all pages
     const pages = findPages();
