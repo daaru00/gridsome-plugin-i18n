@@ -23,47 +23,21 @@ class VueI18n {
     this.api = api
     this.pages = api._app.pages
     this.options = options
+    this.pageToGenerate = []
     this.options.defaultLocale = options.defaultLocale || options.locales[0]
-    api._app.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
-    api._app.pages.hooks.pageContext.tap('i18n', this.createPageHook.bind(this))
+    api._app.pages.hooks.createPage.tap('i18n', this.createPageHook.bind(this))
     api.createManagedPages(this.createManagedPages.bind(this))
   }
 
-  /**
+    /**
    * Create manage pages
    * 
    * @param {function} param.findPages
    * @param {function} param.createPage
    */
-  createManagedPages({ findPages, createPage }) {
-    // List all pages
-    const pages = findPages();
-    for (const page of pages) {
-      // Load page's route
-      const route = this.pages.getRoute(page.internal.route)
-      for (const locale of this.options.locales) {
-        // Skip generation for default language
-        if (
-          locale === this.options.defaultLocale && 
-          this.options.rewriteDefaultLanguage === false
-        ) {
-          continue
-        }
-        // Create a page clone on a path with locale segment
-        const pathSegment = this.options.pathAliases[locale] || locale
-        createPage({
-          path: this.mergePathParts(pathSegment, route.path),
-          component: route.component,
-          context: Object.assign({}, page.context, {
-            locale:  `${locale}`
-          }),
-          route:{
-            meta: {
-              locale:  `${locale}`
-            }
-          }
-        })
-      }
+  createManagedPages({ createPage }) {
+    for (const page of this.pageToGenerate) {
+      createPage(page)
     }
   }
 
@@ -103,30 +77,37 @@ class VueI18n {
   /**
    * Hook into create route process
    * 
-   * @param {*} options
+   * @param {*} options 
    */
-  createRouteHook(options) {
-    const meta = options.internal.meta
-    if (meta && meta.locale) {
-      if (options.name === '404' && options.path !== '/404/') {
-        options.name = `${options.name}__${meta.locale}`
-      }
+  createPageHook(options) {
+    // prevent a hook loop
+    if (options.context.locale !== undefined) {
+      return
     }
+    options.context.locale = this.options.defaultLocale
 
-    if (!meta.locale) {
-      options.internal.meta.locale = this.options.defaultLocale
+    // Retrieve current route
+    const route = this.pages.getRoute(options.internal.route)    
+
+    // Create a page clone on a path with locale segment
+    for (const locale of this.options.locales) {
+      const pathSegment = this.options.pathAliases[locale] || locale
+      this.pageToGenerate.push({ 
+        path: path.join(`/${pathSegment}/`, options.path),
+        component: route.component,
+        context: Object.assign({}, options.context || {},{
+          locale: `${locale}`
+        }),
+        route: {
+          name: route.name ? `${route.name}__${locale}` : undefined,
+          meta: Object.assign(options.meta || {},{
+            locale:  `${locale}`
+          })
+        },
+      })
     }
 
     return options
-  }
-
-  /**
-   * Hook into create page process
-   * 
-   * @param {*} options
-   */
-  createPageHook(context) {
-    context.locale = this.options.defaultLocale
   }
 
 }
