@@ -1,5 +1,3 @@
-const path = require('path')
-
 class VueI18n {
   /**
    * Default plugin options
@@ -94,7 +92,7 @@ class VueI18n {
     for (const locale of this.options.locales) {
       const pathSegment = this.options.pathAliases[locale] || locale
       this.pageToGenerate.push({ 
-        path: path.join(`/${pathSegment}/`, options.path),
+        path: this.mergePathParts(pathSegment, options.path),
         component: route.component,
         context: Object.assign({}, options.context || {},{
           locale: `${locale}`
