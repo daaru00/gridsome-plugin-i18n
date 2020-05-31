@@ -24,9 +24,11 @@ class VueI18n {
     this.pagesToGenerate = []
     this.pagesToReplace = {}
     this.options.defaultLocale = options.defaultLocale || options.locales[0]
-    api._app.pages.hooks.createPage.tap('i18n', this.createPageHook.bind(this))
-    api._app.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
-    api._app.pages.hooks.pageContext.tap('i18n', this.pageContextHook.bind(this))
+
+    this.pages.hooks.createPage.tap('i18n', this.createPageHook.bind(this))
+    this.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
+    this.pages.hooks.pageContext.tap('i18n', this.pageContextHook.bind(this))
+
     api.createManagedPages(this.createManagedPages.bind(this))
   }
 
@@ -163,7 +165,6 @@ class VueI18n {
     }
 
     if (!meta.locale) {
-      // FIXME: this currently not working, using i18n internal fallback
       options.internal.meta.locale = this.options.defaultLocale
     }
 
