@@ -21,7 +21,8 @@ class VueI18n {
     this.api = api
     this.pages = api._app.pages
     this.options = options
-    this.pageToGenerate = []
+    this.pagesToGenerate = []
+    this.pagesToReplace = {}
     this.options.defaultLocale = options.defaultLocale || options.locales[0]
     api._app.pages.hooks.createPage.tap('i18n', this.createPageHook.bind(this))
     api._app.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
@@ -35,8 +36,15 @@ class VueI18n {
    * @param {function} param.findPages
    * @param {function} param.createPage
    */
-  createManagedPages({ createPage }) {
-    for (const page of this.pageToGenerate) {
+  createManagedPages({ createPage, removePage }) {
+    // Create new pages
+    for (const page of this.pagesToGenerate) {
+      createPage(page)
+    }
+    // Edit existing pages
+    for (const pageId in this.pagesToReplace) {
+      const page = this.pagesToReplace[pageId]
+      removePage(pageId)
       createPage(page)
     }
   }
@@ -82,7 +90,7 @@ class VueI18n {
   createPageHook(options) {
     // prevent a hook loop
     if (options.context.locale !== undefined) {
-      return
+      return options
     }
     options.context.locale = this.options.defaultLocale
 
@@ -92,7 +100,7 @@ class VueI18n {
     // Create a page clone on a path with locale segment
     for (const locale of this.options.locales) {
       const pathSegment = this.options.pathAliases[locale] || locale
-      this.pageToGenerate.push({ 
+      this.pagesToGenerate.push({ 
         path: this.mergePathParts(pathSegment, options.path),
         component: route.component,
         context: Object.assign({}, options.context || {},{
@@ -106,6 +114,24 @@ class VueI18n {
         },
         queryVariables: options.internal.queryVariables
       })
+    }
+
+    // need to removed and created again for these pages
+    if (options.internal.isDynamic === false && options.internal.isManaged === false) {
+      this.pagesToReplace[options.id] = {
+        path: options.path,
+        component: route.component,
+        context: Object.assign({}, options.context || {},{
+          locale: this.options.defaultLocale
+        }),
+        route: {
+          name: route.name,
+          meta: Object.assign({}, options.meta || {},{
+            locale: this.options.defaultLocale
+          })
+        },
+        queryVariables: options.internal.queryVariables
+      }
     }
 
     return options
