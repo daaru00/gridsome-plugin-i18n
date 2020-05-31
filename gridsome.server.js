@@ -25,6 +25,7 @@ class VueI18n {
     this.options.defaultLocale = options.defaultLocale || options.locales[0]
     api._app.pages.hooks.createPage.tap('i18n', this.createPageHook.bind(this))
     api._app.pages.hooks.createRoute.tap('i18n', this.createRouteHook.bind(this))
+    api._app.pages.hooks.pageContext.tap('i18n', this.pageContextHook.bind(this))
     api.createManagedPages(this.createManagedPages.bind(this))
   }
 
@@ -100,7 +101,7 @@ class VueI18n {
         route: {
           name: route.name ? `${route.name}__${locale}` : undefined,
           meta: Object.assign({}, options.meta || {},{
-            locale:  `${locale}`
+            locale: `${locale}`
           })
         },
         queryVariables: options.internal.queryVariables
@@ -108,6 +109,18 @@ class VueI18n {
     }
 
     return options
+  }
+
+  /**
+   * Hook into create page context
+   * 
+   * @param {*} options 
+   */
+  pageContextHook(context) {
+    if (!context.locale) {
+      context.locale = this.options.defaultLocale
+    }
+    return context
   }
 
   /**
