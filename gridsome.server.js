@@ -117,7 +117,7 @@ class VueI18n {
     }
 
     // need to removed and created again for these pages
-    if (options.internal.isDynamic === false && options.internal.isManaged === false) {
+    if (options.path !== '/404' && options.internal.isDynamic === false && options.internal.isManaged === false) {
       this.pagesToReplace[options.id] = {
         path: options.path,
         component: route.component,
