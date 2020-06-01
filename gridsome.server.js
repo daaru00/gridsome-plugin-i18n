@@ -13,9 +13,9 @@ class VueI18n {
   }
 
   /**
-   * 
-   * @param {*} api 
-   * @param {*} options 
+   *
+   * @param {*} api
+   * @param {*} options
    */
   constructor (api, options) {
     this.api = api
@@ -34,7 +34,7 @@ class VueI18n {
 
     /**
    * Create manage pages
-   * 
+   *
    * @param {function} param.findPages
    * @param {function} param.createPage
    */
@@ -49,11 +49,27 @@ class VueI18n {
       removePage(pageId)
       createPage(page)
     }
+    // Set correct locale for unknown (404) pages with locale segment
+    for (const locale of this.options.locales) {
+     const pathSegment = this.options.pathAliases[locale] || locale
+     createPage({
+       path: `/${pathSegment}/:slug+`,
+       component: './src/pages/404.vue',
+       context: {
+         locale
+       },
+       route: {
+         meta: {
+           locale
+         }
+       }
+     })
+    }
   }
 
   /**
    * Merge paths parts into one
-   * 
+   *
    * @param {string} parts multiple arguments
    * @returns {string}
    */
@@ -86,8 +102,8 @@ class VueI18n {
 
   /**
    * Hook into create route process
-   * 
-   * @param {*} options 
+   *
+   * @param {*} options
    */
   createPageHook(options) {
     // prevent a hook loop
@@ -102,7 +118,7 @@ class VueI18n {
     // Create a page clone on a path with locale segment
     for (const locale of this.options.locales) {
       const pathSegment = this.options.pathAliases[locale] || locale
-      this.pagesToGenerate.push({ 
+      this.pagesToGenerate.push({
         path: this.mergePathParts(pathSegment, options.path),
         component: route.component,
         context: Object.assign({}, options.context || {},{
@@ -141,8 +157,8 @@ class VueI18n {
 
   /**
    * Hook into create page context
-   * 
-   * @param {*} options 
+   *
+   * @param {*} options
    */
   pageContextHook(context) {
     if (!context.locale) {
@@ -153,7 +169,7 @@ class VueI18n {
 
   /**
    * Hook into create route process
-   * 
+   *
    * @param {*} options
    */
   createRouteHook(options) {
