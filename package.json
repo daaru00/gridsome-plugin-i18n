@@ -1,6 +1,6 @@
 {
   "name": "gridsome-plugin-i18n",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Gridsome plugin for i18n",
   "main": "gridsome.server.js",
   "repository": {
@@ -13,6 +13,7 @@
   "homepage": "https://github.com/daaru00/gridsome-plugin-i18n#readme",
   "keywords": [
     "gridsome",
+    "gridsome-plugin",
     "i18n"
   ],
   "license": "MIT",
