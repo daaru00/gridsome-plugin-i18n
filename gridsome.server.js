@@ -49,21 +49,28 @@ class VueI18n {
       removePage(pageId)
       createPage(page)
     }
+
     // Set correct locale for unknown (404) pages with locale segment
-    for (const locale of this.options.locales) {
-     const pathSegment = this.options.pathAliases[locale] || locale
-     createPage({
-       path: `/${pathSegment}/:slug+`,
-       component: './src/pages/404.vue',
-       context: {
-         locale
-       },
-       route: {
-         meta: {
-           locale
-         }
-       }
-     })
+    const pageFor404 = this.pages.findPage({ path: '/404' });
+    if (pageFor404) {
+      const route = this.pages.getRoute(pageFor404.internal.route)
+      let componentPathFor404 = route.component;
+
+      for (const locale of this.options.locales) {
+        const pathSegment = this.options.pathAliases[locale] || locale
+        createPage({
+          path: `/${pathSegment}/:slug+`,
+          component: componentPathFor404,
+          context: {
+            locale
+          },
+          route: {
+            meta: {
+              locale
+            }
+          }
+        })
+      }
     }
   }
 
