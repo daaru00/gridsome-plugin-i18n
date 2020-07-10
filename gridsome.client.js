@@ -13,7 +13,8 @@ export default function (Vue, options, { appOptions, router, head }) {
   // Add VueI18n plugin to Vue instance
   Vue.use(VueI18n)
   const i18n = new VueI18n(Object.assign(options, {
-    locale: options.defaultLocale
+    locale: options.defaultLocale,
+    ...(appOptions.i18nOptions || {})
   }))
   appOptions.i18n = i18n
 
