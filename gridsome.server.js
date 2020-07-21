@@ -82,6 +82,9 @@ class VueI18n {
       let componentPathFor404 = route.component;
 
       for (const locale of this.options.locales) {
+        if (!this.options.rewriteDefaultLanguage && locale === this.options.defaultLocale) {
+          continue
+        }
         const pathSegment = this.options.pathAliases[locale] || locale
         createPage({
           path: `/${pathSegment}/:slug+`,
@@ -149,6 +152,9 @@ class VueI18n {
 
     // Create a page clone on a path with locale segment
     for (const locale of this.options.locales) {
+      if (!this.options.rewriteDefaultLanguage && locale === this.options.defaultLocale) {
+        continue
+      }
       const pathSegment = this.options.pathAliases[locale] || locale
       this.pagesToGenerate.push({
         path: this.mergePathParts(pathSegment, options.path),
