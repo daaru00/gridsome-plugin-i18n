@@ -41,8 +41,9 @@ class VueI18n {
    * @param {function} param.createPage
    */
   createManagedPages({ createPage, removePage }) {
+
     // Create custom localized routes using the this.options.routes object
-    if (this.options.enablePathGeneration === false && this.options.routes) {
+    if (this.options.routes) {
       this.options.routes.forEach(route => {
         createPage({
           path: route.path,
@@ -63,8 +64,8 @@ class VueI18n {
     }
 
     // Disallow the automatic creation of the localized routes
-    if (this.options.enablePathGeneration === false) return;
-
+    if (!this.options.enablePathGeneration) return;
+    
     // Create new pages
     for (const page of this.pagesToGenerate) {
       createPage(page)
