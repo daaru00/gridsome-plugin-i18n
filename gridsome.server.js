@@ -110,7 +110,7 @@ class VueI18n {
         }),
         route: {
           name: route.name ? `${route.name}__${locale}` : undefined,
-          meta: Object.assign({}, options.meta || {},{
+          meta: Object.assign({}, options.meta || {}, route.internal.meta || {}, {
             locale: `${locale}`
           })
         },
@@ -128,7 +128,7 @@ class VueI18n {
         }),
         route: {
           name: route.name,
-          meta: Object.assign({}, options.meta || {},{
+          meta: Object.assign({}, options.meta || {}, route.internal.meta || {}, {
             locale: this.options.defaultLocale
           })
         },
