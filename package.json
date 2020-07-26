@@ -1,6 +1,6 @@
 {
   "name": "gridsome-plugin-i18n",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Gridsome plugin for i18n",
   "main": "gridsome.server.js",
   "repository": {
