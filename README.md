@@ -359,3 +359,11 @@ const localizedPath = this.$tp('/it/projects/', 'fr-fr', true)
 // localizedPath is "/fr/projects/"
 ```
 useful to language selector implementation.
+
+## Use cases
+
+Links and resources for usage with other Gridsome source and plugins
+
+### @gridsome/source-filesystem
+
+Refer to this issue's comments to find an example of usage with Gridsome filesystem source plugin: [#16](https://github.com/daaru00/gridsome-plugin-i18n/issues/16#issuecomment-637499454)
