@@ -8,7 +8,6 @@ class VueI18n {
       messages: {},
       pathAliases: {},
       defaultLocale: null,
-      enablePathRewrite: true,
       enablePathGeneration: true,
       routes: null
     }
@@ -42,29 +41,28 @@ class VueI18n {
    */
   createManagedPages({ createPage, removePage }) {
 
-    // Create custom localized routes using the this.options.routes object
-    if (this.options.routes) {
-      this.options.routes.forEach(route => {
-        createPage({
-          path: route.path,
-          component: route.component,
-          context: {
-            locale: route.locale,
-            slug: route.slug
-          },
-          route: {
-            meta: {
-              locale: route.locale
-            }
-          }
-        })
-      });
-
-      return;
-    }
+    // Create custom localized routes
+    this.options.locales.forEach(locale => {
+      const routes = this.options.routes[locale]
+      if (!routes) {
+        return
+      }
+      
+      routes.forEach(customRoute => {
+        customRoute.route = customRoute.route || {}
+        customRoute.route.meta = customRoute.route.meta || {}
+        customRoute.route.meta.locale = locale
+    
+        customRoute.context = customRoute.context || {}
+        customRoute.context.locale = locale
+    
+        createPage(customRoute);
+      })
+    
+    })
 
     // Disallow the automatic creation of the localized routes
-    if (!this.options.enablePathGeneration) return;
+    if (this.options.enablePathGeneration === false) return;
     
     // Create new pages
     for (const page of this.pagesToGenerate) {
