@@ -90,7 +90,21 @@ Enable automatic rewrite of path for Vue Router.
 - Type: `boolean`
 - Default: `true`
 
-Enable path rewrite for default language
+Enable path rewrite for default language.
+
+#### enablePathGeneration
+
+- Type: `boolean`
+- Default: `true`
+
+Enable translated path automatic generation. Disabling this no additional pages are generated, just include i18n Vue Plugin and let you to manage translated path generation.
+
+#### routes
+
+- Type: `object`
+- Default: `{}`
+
+Routes to generate using a custom path.
 
 ## Usage
 
@@ -179,6 +193,140 @@ will generate these pages:
 /en/blog/article2 -> component article
 ```
 
+### Route translation
+
+If you want to translate the path of pages for each language, you first need to disable the automatic path generation:
+```js
+module.exports = {
+  plugins: [
+    {
+      use: "gridsome-plugin-i18n",
+      options: {
+        locales: [
+          'it-it',
+          'en-gb'
+        ],
+        enablePathGeneration: false // disable path generation
+      }
+    }
+  ]
+};
+```
+now you can manually add your routes declaration for each languages. 
+
+It is recommended to use a separate file in order not to enlarge the configuration file, add a file named `routes.js` in the root directory of your project:
+```js
+module.exports = {
+  en: [
+    {
+      path: '/en/',
+      component: './src/pages/Index.vue'
+    },
+    {
+      path: '/en/about/',
+      component: './src/pages/About.vue'
+    }
+  ],
+  it: [
+    {
+      path: '/',
+      component: './src/pages/Index.vue'
+    },
+    {
+      path: '/it/chi-siamo/',
+      component: './src/pages/About.vue'
+    }
+  ]
+};
+```
+then load this route file into Gridsome configuration file:
+```js
+module.exports = {
+  plugins: [
+    {
+      use: "gridsome-plugin-i18n",
+      options: {
+        locales: [
+          'it-it',
+          'en-gb'
+        ],
+        enablePathGeneration: false, 
+        routes: require('./routes.js') // load path translation declaration from external file
+      }
+    }
+  ]
+};
+```
+this plugin will generate pages based on provided configurations.
+
+### Route translation using remote routing system
+
+If you have a large project and you manage your page path from data source simply disable path generation:
+```js
+module.exports = {
+  plugins: [
+    {
+      use: "gridsome-plugin-i18n",
+      options: {
+        locales: [
+          'it-it',
+          'en-gb'
+        ],
+        enablePathGeneration: false, // disable path generation
+        routes: {} // disable path generation
+      }
+    }
+  ]
+};
+```
+set `routes` settings as an empty object or directly not set it.
+
+Generate pages from your external source inside your `gridsome.server.js`:
+```js
+module.exports = function (api) {
+  api.createPages(async ({ createPage, graphql }) => {
+    
+    // query your data source to retrieve pages
+    const response = await graphql(`
+      query {
+        mysource {
+          PageItems {
+            items {
+              id
+              name,
+              path,
+              slug
+            }
+          }
+        }
+      }
+    `)
+
+    if (response.errors) {
+      throw response.errors[0]
+    }
+
+    // generate pages from query response
+    response.data.mysource.PageItems.items.forEach((page) => {
+      createPage({
+        path: page.path || page.slug, // here you can handle page's path
+        component: './src/templates/DynamicPage.vue',
+        context: {
+          id: page.id,
+          locale: page.locale // set page locale for context variable (used for GraphQL queries)
+        },
+        route: {
+          meta: {
+            locale: page.locale // set page locale for frontend routing
+          }
+        }
+      })
+    })
+  })
+}
+```
+this give you the complete control of routes path translation and management.
+
 ### Content translation
 
 This plugin will set a context property to store current locale:
@@ -225,6 +373,7 @@ query($locale:String) {
 }
 </page-query>
 ```
+your data source need to support query based on locale.
 
 ### Hot reload
 
