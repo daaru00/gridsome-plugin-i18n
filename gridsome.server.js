@@ -9,7 +9,7 @@ class VueI18n {
       pathAliases: {},
       defaultLocale: null,
       enablePathGeneration: true,
-      routes: null
+      routes: {}
     }
   }
 
