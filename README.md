@@ -398,9 +398,9 @@ and load it from `main.js` file:
 export default function (Vue, { appOptions }) {
   // ...
   appOptions.i18n.setLocaleMessage('it-it', require('./locales/it-it.json'))
-  appOptions.i18n.setLocaleMessage('fr-fr': require('./locales/fr-fr.json'))
-  appOptions.i18n.setLocaleMessage('de-de': require('./locales/de-de.json'))
-  appOptions.i18n.setLocaleMessage('en-gb': require('./locales/en-gb.json'))
+  appOptions.i18n.setLocaleMessage('fr-fr', require('./locales/fr-fr.json'))
+  appOptions.i18n.setLocaleMessage('de-de', require('./locales/de-de.json'))
+  appOptions.i18n.setLocaleMessage('en-gb', require('./locales/en-gb.json'))
 }
 ```
 this will use i18n [setLocaleMessage](https://kazupon.github.io/vue-i18n/api/#setlocalemessage-locale-message) API to load message from client side. 
