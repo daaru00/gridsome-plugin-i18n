@@ -47,23 +47,23 @@ class VueI18n {
       if (!routes) {
         return
       }
-      
+
       routes.forEach(customRoute => {
         customRoute.route = customRoute.route || {}
         customRoute.route.meta = customRoute.route.meta || {}
         customRoute.route.meta.locale = locale
-    
+
         customRoute.context = customRoute.context || {}
         customRoute.context.locale = locale
-    
+
         createPage(customRoute);
       })
-    
+
     })
 
     // Disallow the automatic creation of the localized routes
     if (this.options.enablePathGeneration === false) return;
-    
+
     // Create new pages
     for (const page of this.pagesToGenerate) {
       createPage(page)
@@ -142,7 +142,12 @@ class VueI18n {
     if (options.context.locale !== undefined) {
       return options
     }
-    options.context.locale = this.options.defaultLocale
+    options.context.locale =
+        (options &&
+            options.internal &&
+            options.internal.queryVariables &&
+            options.internal.queryVariables.locale) ||
+        this.options.defaultLocale
 
     // Retrieve current route
     const route = this.pages.getRoute(options.internal.route)
@@ -213,7 +218,10 @@ class VueI18n {
     }
 
     if (!meta.locale) {
-      options.internal.meta.locale = this.options.defaultLocale
+      const [locale] = options.path.match(
+          new RegExp(`\/${this.options.locales.join('/|/')}\/`)
+      ) || [this.options.defaultLocale]
+      options.internal.meta.locale = locale.replace(/\//g, '')
     }
 
     return options
