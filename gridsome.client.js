@@ -110,9 +110,12 @@ export default function (Vue, options, { appOptions, router, head }) {
       return next()
     }
 
+    const hash = to.hash || '';
+
     // Rewrite path
     next({
-      path: translatedPath
+      path: translatedPath,
+      hash
     })
   })
 
