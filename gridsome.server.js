@@ -26,7 +26,7 @@ class VueI18n {
        *  Post: [
           {
             path: (node) => {
-              return `/${node.lang}/c/${node.slug}`
+              return `/${node.lang}/blog/${node.slug}`
             }
           }
           ],
