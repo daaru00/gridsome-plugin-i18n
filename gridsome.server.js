@@ -9,6 +9,34 @@ class VueI18n {
       pathAliases: {},
       defaultLocale: null,
       enablePathGeneration: true,
+
+      /** optional: allows to skip creating page clones per locale
+       * if the path already starts with a locale e.g. /en/blog/foo or /de/blog/bar
+       * 
+       * This can be the case for templates which already contain a locale
+       * coming e.g. from a .md file where people maintain it themselves.
+       * 
+       * In this case those pages are already correct and can be skipped
+       * while still creating path for everything else.
+       * 
+       * 
+       * Example: 
+       * ```
+       * templates: {
+       *  Post: [
+          {
+            path: (node) => {
+              return `/${node.lang}/c/${node.slug}`
+            }
+          }
+          ],
+          ...
+          }
+          ```
+          
+       * 
+      */
+      skipPagesStartingWithLocale: false,
       routes: {}
     }
   }
@@ -147,23 +175,32 @@ class VueI18n {
     // Retrieve current route
     const route = this.pages.getRoute(options.internal.route)
 
-    // Create a page clone on a path with locale segment
-    for (const locale of this.options.locales) {
-      const pathSegment = this.options.pathAliases[locale] || locale
-      this.pagesToGenerate.push({
-        path: this.mergePathParts(pathSegment, options.path),
-        component: route.component,
-        context: Object.assign({}, options.context || {},{
-          locale: `${locale}`
-        }),
-        route: {
-          name: route.name ? `${route.name}__${locale}` : undefined,
-          meta: Object.assign({}, options.meta || {}, route.internal.meta || {}, {
+    let pathStartsWithLocaleAready = this.pathStartsWithLocaleAlready(options.path);
+
+    if(pathStartsWithLocaleAready){
+      console.log("Path already starts with locale. Just keep the page as is: " + options.path)
+    }
+    else{
+      
+      // Create a page clone on a path with locale segment
+      for (const locale of this.options.locales) {
+        const pathSegment = this.options.pathAliases[locale] || locale
+        this.pagesToGenerate.push({
+          path: this.mergePathParts(pathSegment, options.path),
+          component: route.component,
+          context: Object.assign({}, options.context || {},{
             locale: `${locale}`
-          })
-        },
-        queryVariables: options.internal.queryVariables
-      })
+          }),
+          route: {
+            name: route.name ? `${route.name}__${locale}` : undefined,
+            meta: Object.assign({}, options.meta || {}, route.internal.meta || {}, {
+              locale: `${locale}`
+            })
+          },
+          queryVariables: options.internal.queryVariables
+        })
+      }
+
     }
 
     // need to removed and created again for these pages
@@ -185,6 +222,18 @@ class VueI18n {
     }
 
     return options
+  }
+
+  pathStartsWithLocaleAlready(path){
+    if (this.options.skipPagesStartingWithLocale === true){
+      for (const locale of this.options.locales) {
+        if(path.startsWith('/' + locale + '/')) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
