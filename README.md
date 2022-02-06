@@ -99,6 +99,37 @@ Enable path rewrite for default language.
 
 Enable translated path automatic generation. Disabling this no additional pages are generated, just include i18n Vue Plugin and let you to manage translated path generation.
 
+#### skipPagesStartingWithLocale
+
+- Type: `boolean`
+- Default: `false`
+
+Skips creating page clones per locale if the path already starts with a locale e.g. `/en/blog/foo` or `/de/blog/foo`
+
+This can be the case for gridsome templates which already contain a locale-prefix coming e.g. from a .md file where people maintain the language / locale themselves (e.g. in a frontmatter block with a "lang: en" flag)
+
+In this case those pages are already correct and can be skipped while still creating a locale-path for everything else.
+
+Example:
+
+```js
+// gridsome-config.js
+
+templates: {
+Post: [
+ {
+  path: (node) => {
+    return `/${node.lang}/blog/${node.slug}`
+  }
+ }
+],
+}
+```
+
+In this example the locale is take from ```node.lang``` which could come from a `.md` file when using `@gridsome/source-filesystem`
+
+This might be a corner-case flag, but useful if this plugin works for 90% of existing pages, but you have some exceptions, where you have maintained you locale yourself already.
+
 #### routes
 
 - Type: `object`
